@@ -1,4 +1,4 @@
-import { useState,useCallback } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 
 import './App.css'
 
@@ -8,10 +8,31 @@ function App() {
   const [charAllowed, setCharAllowed] = useState(false)
   const [password, setPassword] = useState('')
 
-const generatePassword = useCallback(()=>{
-  let pass = ''
-  let str="ABCDEFGHJIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuv"
-})
+  const passwordRef = useRef(null)
+
+  const generatePassword = useCallback(() => {
+    let pass = ''
+    let str = "ABCDEFGHJIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuv"
+
+    if (numberAllowed) str += '0123456789'
+    if (charAllowed) str += '!@#$%^&*()_+'
+
+    for (let i = 1; i <= length; i++) {
+      const index = Math.floor(Math.random() * str.length + 1)
+      pass += str.charAt(index)
+    }
+    setPassword(pass)
+  }, [length, numberAllowed, charAllowed])
+
+  const copyPasswordToClipboard = () => {
+    window.navigator.clipboard.writeText(password)
+    // passwordRef.current?.select()
+  }
+
+  useEffect(() => {
+    generatePassword()
+  }, [length, numberAllowed, charAllowed])
+
 
   return (
 
@@ -19,11 +40,13 @@ const generatePassword = useCallback(()=>{
       <h1 className='text-white text-center my-3'>Password Generator</h1>
       <div className='flex shadow rounded-lg overflow-hidden mb-4'>
         <input
+          onClick={copyPasswordToClipboard}
           type="text"
           value={password}
           className='outline-none w-full py-1 px-3'
           placeholder='Password'
           readOnly
+          ref={passwordRef}
         />
         <button
           className='outline-none bg-blue-700 text-white px-3 py-0.5 shrink-0'
@@ -45,26 +68,26 @@ const generatePassword = useCallback(()=>{
           <label htmlFor="length">Length: {length}</label>
         </div>
         <div>
-          <input 
-          type="checkbox" 
-          defaultChecked={numberAllowed}
-          onChange={()=>{
-            setNumberAllowed((prev)=>!prev)
-          }}
-          name=''
-          id=''
+          <input
+            type="checkbox"
+            defaultChecked={numberAllowed}
+            onChange={() => {
+              setNumberAllowed((prev) => !prev)
+            }}
+            name=''
+            id=''
           />
           <label htmlFor="number">Number</label>
         </div>
         <div>
-          <input 
-          type="checkbox" 
-          defaultChecked={charAllowed}
-          onChange={()=>{
-            setCharAllowed((prev)=>!prev)
-          }}
-          name=''
-          id=''
+          <input
+            type="checkbox"
+            defaultChecked={charAllowed}
+            onChange={() => {
+              setCharAllowed((prev) => !prev)
+            }}
+            name=''
+            id=''
           />
           <label htmlFor="charInput">Character</label>
         </div>
